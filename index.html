@@ -1,133 +1,857 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <meta name="theme-color" content="#c71920">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="NİTEK Servis">
-<link rel="icon" href="logo.jpg">
-<link rel="apple-touch-icon" href="logo.jpg">
-<link rel="stylesheet" href="style.css">
+<meta name="apple-mobile-web-app-title" content="NİTEK Teknik Servis">
+
 <title>NİTEK Teknik Servis</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  background:#f4f5f7;
+  color:#17191c;
+}
+header{
+  background:#c71920;
+  color:white;
+  padding:16px;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+.header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.logo{
+  width:48px;
+  height:48px;
+  border-radius:12px;
+  object-fit:cover;
+  background:white;
+}
+header h1{
+  font-size:18px;
+  margin:0;
+}
+header small{
+  opacity:.85;
+}
+main{
+  padding:16px;
+  max-width:700px;
+  margin:auto;
+}
+.card{
+  background:white;
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:14px;
+  box-shadow:0 3px 15px #00000012;
+}
+h2{
+  margin:0 0 14px;
+  font-size:21px;
+}
+h3{
+  margin:0 0 8px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+button{
+  border:0;
+  border-radius:13px;
+  padding:14px;
+  font-size:16px;
+  font-weight:600;
+  cursor:pointer;
+}
+.primary{
+  background:#c71920;
+  color:white;
+}
+.secondary{
+  background:#eceef1;
+  color:#222;
+}
+.success{
+  background:#168a45;
+  color:white;
+}
+input,select,textarea{
+  width:100%;
+  padding:13px;
+  border:1px solid #d4d7dc;
+  border-radius:11px;
+  font-size:16px;
+  margin:6px 0 12px;
+  background:white;
+}
+textarea{
+  min-height:90px;
+  resize:vertical;
+}
+label{
+  font-size:14px;
+  font-weight:600;
+}
+.menu{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.menu button{
+  min-height:100px;
+  background:white;
+  border:1px solid #ddd;
+}
+.icon{
+  font-size:30px;
+  display:block;
+  margin-bottom:8px;
+}
+.hidden{
+  display:none!important;
+}
+.customer{
+  padding:13px;
+  border:1px solid #ddd;
+  border-radius:12px;
+  margin:7px 0;
+  background:white;
+}
+.customer b{
+  display:block;
+}
+.service{
+  border-left:5px solid #c71920;
+  padding:12px;
+  background:#fff;
+  border-radius:10px;
+  margin:8px 0;
+}
+.status{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:12px;
+  background:#eee;
+}
+.form-actions{
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+}
+.form-actions button{
+  flex:1;
+}
+hr{
+  border:0;
+  border-top:1px solid #eee;
+  margin:18px 0;
+}
+.empty{
+  text-align:center;
+  padding:25px;
+  color:#777;
+}
+@media(max-width:480px){
+  .grid{grid-template-columns:1fr}
+  main{padding:12px}
+}
+@media print{
+  header,.no-print{display:none!important}
+  body{background:white}
+  main{max-width:none}
+  .card{box-shadow:none}
+}
+</style>
 </head>
+
 <body>
-<div id="toast"></div>
-<header class="topbar">
-  <button class="iconbtn" id="backBtn" onclick="goBack()">‹</button>
-  <div class="brand"><img src="logo.jpg" alt="NİTEK"><div><b>NİTEK Teknik Servis</b><small>Servis Yönetim Sistemi</small></div></div>
-  <button class="iconbtn" onclick="showTab('settings')">⚙️</button>
+
+<header>
+  <div class="header">
+    <img src="logo.jpg" class="logo" onerror="this.style.display='none'">
+    <div>
+      <h1>NİTEK Teknik Servis</h1>
+      <small>Kombi • Klima • Teknik Servis</small>
+    </div>
+  </div>
 </header>
 
-<section id="auth" class="auth">
-  <div class="authbox">
-    <img src="logo.jpg" class="authlogo" alt="NİTEK">
-    <h1>NİTEK Teknik Servis</h1>
-    <p class="muted">Müşteri, servis, kasa ve bakım takibi</p>
-    <input id="email" type="email" placeholder="E-posta">
-    <input id="password" type="password" placeholder="Şifre">
-    <button class="primary wide" onclick="login()">Giriş Yap</button>
-    <button class="secondary wide" onclick="signup()">Yeni Hesap Oluştur</button>
-    <div id="authMsg" class="msg"></div>
+<main>
+
+<!-- ANA SAYFA -->
+<section id="home">
+
+  <div class="card">
+    <h2>Servis Yönetimi</h2>
+
+    <div class="menu">
+      <button onclick="showPage('newService')">
+        <span class="icon">🔧</span>
+        Yeni Servis
+      </button>
+
+      <button onclick="showPage('customers')">
+        <span class="icon">👤</span>
+        Müşteriler
+      </button>
+
+      <button onclick="showPage('services')">
+        <span class="icon">📋</span>
+        Servisler
+      </button>
+
+      <button onclick="showPage('newCustomer')">
+        <span class="icon">➕</span>
+        Yeni Müşteri
+      </button>
+    </div>
   </div>
+
+  <div class="card">
+    <h2>Bugünün Özeti</h2>
+    <div class="grid">
+      <div>
+        <b id="customerCount">0</b>
+        <small>Müşteri</small>
+      </div>
+      <div>
+        <b id="serviceCount">0</b>
+        <small>Servis</small>
+      </div>
+    </div>
+  </div>
+
 </section>
 
-<main id="app" class="hidden">
-  <div id="dashboard" class="tab active">
-    <div class="hero"><div><h2>Merhaba 👋</h2><p class="muted">Bugünkü servislerini buradan yönet.</p></div><button class="primary" onclick="openServiceForm()">+ Servis</button></div>
-    <div class="quickgrid">
-      <button onclick="openCustomerForm()">👤<span>Yeni Müşteri</span></button>
-      <button onclick="openServiceForm()">🔧<span>Yeni Servis</span></button>
-      <button onclick="showTab('pending')">⏳<span>Bekleyen</span><b id="qPending">0</b></button>
-      <button onclick="showTab('faultcodes')">🔥<span>Arıza Kodları</span></button>
-      <button onclick="showTab('cash')">💰<span>Kasa</span></button>
-      <button onclick="showTab('reports')">📊<span>Raporlar</span></button>
-    </div>
-    <div class="stats" id="stats"></div>
-    <div id="todayCalls" class="card"></div>
-    <div id="todayServices" class="card"></div>
-  </div>
 
-  <div id="customers" class="tab">
-    <div class="sectionhead"><h2>👤 Müşteriler</h2><button class="primary" onclick="openCustomerForm()">+ Müşteri</button></div>
-    <input id="customerSearch" oninput="renderCustomers()" placeholder="🔎 Müşteri, telefon, marka ara">
-    <div id="customerList"></div>
-  </div>
+<!-- YENİ MÜŞTERİ -->
+<section id="newCustomer" class="hidden">
 
-  <div id="services" class="tab">
-    <div class="sectionhead"><h2>🔧 Servisler</h2><button class="primary" onclick="openServiceForm()">+ Servis</button></div>
-    <input id="serviceSearch" oninput="renderServices()" placeholder="🔎 Servis / müşteri / arıza ara">
-    <div id="serviceList"></div>
-  </div>
+<div class="card">
+<h2>➕ Yeni Müşteri</h2>
 
-  <div id="pending" class="tab">
-    <div class="sectionhead"><h2>⏳ Bekleyen Servisler</h2><span class="badge" id="pendingCount">0</span></div>
-    <select id="pendingFilter" onchange="renderPending()"><option value="all">Tümü</option><option>Bekliyor</option><option>İşlemde</option><option>Parça Bekliyor</option><option>Müşteri Onayı Bekliyor</option></select>
-    <div id="pendingList"></div>
-  </div>
+<label>Ad Soyad</label>
+<input id="customerName" placeholder="Örn: Ahmet Yılmaz">
 
-  <div id="calendar" class="tab">
-    <div class="sectionhead"><h2>📅 Günlük Servis</h2><input id="calendarDate" type="date" onchange="renderCalendar()"></div>
-    <div id="calendarList"></div>
-  </div>
+<label>Telefon</label>
+<input id="customerPhone" type="tel" placeholder="05xx xxx xx xx">
 
-  <div id="faultcodes" class="tab">
-    <div class="sectionhead"><h2>🔥 Kombi Arıza Kodları</h2></div>
-    <div class="filters"><select id="faultBrand" onchange="updateModels();renderFaults()"><option value="">Tüm markalar</option></select><select id="faultModel" onchange="renderFaults()"><option value="">Tüm modeller</option></select></div>
-    <input id="faultSearch" oninput="renderFaults()" placeholder="🔎 Kod, model veya açıklama ara">
-    <div id="faultList"></div>
-  </div>
+<label>Adres</label>
+<textarea id="customerAddress" placeholder="Müşteri adresi"></textarea>
 
-  <div id="diagnosis" class="tab">
-    <div class="sectionhead"><h2>🧠 Akıllı Teşhis</h2></div>
-    <div class="card">
-      <select id="dDevice"><option>Kombi</option><option>Klima</option></select>
-      <select id="dBrand"><option>Marka seç</option><option>Baymak</option><option>Demirdöküm</option><option>E.C.A.</option><option>Vaillant</option><option>Bosch</option><option>Buderus</option><option>Viessmann</option><option>Ariston</option></select>
-      <input id="dCode" placeholder="Arıza kodu (örn. E01 / F28)">
-      <label class="check"><input id="dPower" type="checkbox"> Cihaz açılıyor</label>
-      <label class="check"><input id="dIgnition" type="checkbox"> Ateşleme yapıyor</label>
-      <label class="check"><input id="dHot" type="checkbox"> Sıcak su var</label>
-      <label class="check"><input id="dHeat" type="checkbox"> Petekler ısınıyor</label>
-      <label class="check"><input id="dPressure" type="checkbox"> Basınç 1–2 bar civarında</label>
-      <label class="check"><input id="dLeak" type="checkbox"> Su kaçağı var</label>
-      <button class="primary wide" onclick="diagnose()">🔎 Teşhisi Oluştur</button>
-    </div>
-    <div id="diagnosisResult"></div>
-  </div>
+<button class="primary" onclick="saveCustomer()">Müşteriyi Kaydet</button>
+<button class="secondary" onclick="showPage('home')">Geri</button>
 
-  <div id="cash" class="tab">
-    <div class="sectionhead"><h2>💰 Kasa</h2><button class="primary" onclick="openExpenseForm()">+ Gider</button></div>
-    <div id="cashStats" class="stats"></div>
-    <div id="cashList"></div>
-  </div>
+</div>
+</section>
 
-  <div id="reports" class="tab">
-    <div class="sectionhead"><h2>📊 Raporlar</h2><input id="reportMonth" type="month" onchange="renderReports()"></div>
-    <div id="reportCards" class="stats"></div>
-  </div>
 
-  <div id="settings" class="tab">
-    <div class="sectionhead"><h2>⚙️ Ayarlar</h2></div>
-    <div class="card">
-      <h3>☁️ Bulut ve Yedekleme</h3>
-      <p class="muted">Veriler Supabase'de tutulur. Ayrıca tek dosyalık acil durum yedeği alabilirsin.</p>
-      <div class="row"><button onclick="backup()">⬇️ Yedek Al</button><label class="filebtn">⬆️ Geri Yükle<input type="file" accept=".json" onchange="restore(this.files[0])"></label></div>
-    </div>
-    <div class="card"><h3>📱 Uygulama</h3><p>V18 • NİTEK Teknik Servis</p><button class="danger" onclick="logout()">Çıkış Yap</button></div>
-  </div>
+<!-- MÜŞTERİLER -->
+<section id="customers" class="hidden">
+
+<div class="card">
+<h2>👤 Müşteriler</h2>
+
+<input id="customerSearch"
+       placeholder="Müşteri ara..."
+       oninput="renderCustomers()">
+
+<div id="customerList"></div>
+
+<button class="secondary" onclick="showPage('home')">Geri</button>
+</div>
+
+</section>
+
+
+<!-- YENİ SERVİS -->
+<section id="newService" class="hidden">
+
+<div class="card">
+
+<h2>🔧 Yeni Servis</h2>
+
+<label>Müşteri</label>
+<select id="serviceCustomer"></select>
+
+<button class="secondary" onclick="showPage('newCustomer')">
+➕ Yeni müşteri oluştur
+</button>
+
+<hr>
+
+<label>Servis Tarihi</label>
+<input id="serviceDate" type="date">
+
+<label>Servis Saati</label>
+<input id="serviceTime" type="time">
+
+<label>Adres</label>
+<textarea id="serviceAddress" placeholder="Servis adresi"></textarea>
+
+<label>Cihaz</label>
+<select id="deviceType">
+<option>Kombi</option>
+<option>Klima</option>
+<option>Şofben</option>
+<option>Diğer</option>
+</select>
+
+<label>Marka</label>
+<input id="brand" placeholder="Örn: Demirdöküm">
+
+<label>Model</label>
+<input id="model" placeholder="Model">
+
+<label>Müşteri Şikayeti</label>
+<textarea id="complaint"
+placeholder="Müşteri ne söyledi?"></textarea>
+
+<label>Arıza / Tespit</label>
+<textarea id="diagnosis"
+placeholder="Yapılan kontrol ve tespit"></textarea>
+
+<label>Yapılan İşlem</label>
+<textarea id="workDone"
+placeholder="Yapılan servis işlemi"></textarea>
+
+<label>Ücret (₺)</label>
+<input id="price" type="number" placeholder="0">
+
+<label>Servis Durumu</label>
+<select id="serviceStatus">
+<option>Bekliyor</option>
+<option>Devam ediyor</option>
+<option>Tamamlandı</option>
+<option>İptal</option>
+</select>
+
+<button class="primary" onclick="saveService()">
+💾 Servisi Kaydet
+</button>
+
+<button class="secondary" onclick="showPage('home')">
+Geri
+</button>
+
+</div>
+</section>
+
+
+<!-- SERVİSLER -->
+<section id="services" class="hidden">
+
+<div class="card">
+<h2>📋 Servis Kayıtları</h2>
+
+<input id="serviceSearch"
+       placeholder="Müşteri, telefon veya cihaz ara..."
+       oninput="renderServices()">
+
+<div id="serviceList"></div>
+
+<button class="secondary" onclick="showPage('home')">
+Geri
+</button>
+
+</div>
+</section>
+
+
+<!-- SERVİS FORMU -->
+<section id="serviceForm" class="hidden">
+
+<div class="card" id="printForm">
+
+<h2>🔧 NİTEK TEKNİK SERVİS</h2>
+
+<p><b>Servis Formu</b></p>
+
+<hr>
+
+<div id="formContent"></div>
+
+<hr>
+
+<p>
+<b>Müşteri İmzası:</b>
+<br><br>
+____________________________
+</p>
+
+<p>
+<b>Teknisyen:</b>
+<br><br>
+____________________________
+</p>
+
+</div>
+
+<div class="form-actions no-print">
+<button class="primary" onclick="window.print()">
+🖨️ Yazdır / PDF
+</button>
+
+<button class="secondary" onclick="showPage('services')">
+Geri
+</button>
+</div>
+
+</section>
+
 </main>
 
-<nav id="bottomNav" class="bottom hidden">
-  <button onclick="showTab('dashboard')">🏠<span>Ana</span></button>
-  <button onclick="showTab('customers')">👤<span>Müşteri</span></button>
-  <button onclick="showTab('services')">🔧<span>Servis</span></button>
-  <button onclick="showTab('pending')">⏳<span>Bekleyen</span></button>
-  <button onclick="showTab('calendar')">📅<span>Takvim</span></button>
-  <button onclick="showTab('settings')">⚙️<span>Ayar</span></button>
-</nav>
 
-<div id="modal" class="modal hidden"><div class="modalbox"><button class="close" onclick="closeModal()">×</button><div id="modalBody"></div></div></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js"></script>
+<script>
+
+let customers =
+JSON.parse(localStorage.getItem("nitek_customers") || "[]");
+
+let services =
+JSON.parse(localStorage.getItem("nitek_services") || "[]");
+
+
+function saveData(){
+
+localStorage.setItem(
+"nitek_customers",
+JSON.stringify(customers)
+);
+
+localStorage.setItem(
+"nitek_services",
+JSON.stringify(services)
+);
+
+updateStats();
+}
+
+
+function showPage(page){
+
+document.querySelectorAll("main > section")
+.forEach(x=>x.classList.add("hidden"));
+
+document.getElementById(page)
+.classList.remove("hidden");
+
+if(page==="customers")
+renderCustomers();
+
+if(page==="newService")
+prepareService();
+
+if(page==="services")
+renderServices();
+
+updateStats();
+
+window.scrollTo(0,0);
+}
+
+
+function saveCustomer(){
+
+let name=document.getElementById("customerName").value.trim();
+let phone=document.getElementById("customerPhone").value.trim();
+let address=document.getElementById("customerAddress").value.trim();
+
+if(!name){
+
+alert("Müşteri adını yazın.");
+return;
+
+}
+
+let customer={
+id:Date.now(),
+name,
+phone,
+address
+};
+
+customers.push(customer);
+
+saveData();
+
+document.getElementById("customerName").value="";
+document.getElementById("customerPhone").value="";
+document.getElementById("customerAddress").value="";
+
+alert("Müşteri kaydedildi.");
+
+showPage("newService");
+}
+
+
+function prepareService(){
+
+let select=document.getElementById("serviceCustomer");
+
+select.innerHTML="";
+
+if(customers.length===0){
+
+select.innerHTML=
+'<option value="">Önce müşteri ekleyin</option>';
+
+}else{
+
+customers.forEach(c=>{
+
+let option=document.createElement("option");
+
+option.value=c.id;
+option.textContent=
+c.name+" - "+(c.phone||"Telefon yok");
+
+select.appendChild(option);
+
+});
+
+}
+
+let now=new Date();
+
+document.getElementById("serviceDate").value=
+now.toISOString().split("T")[0];
+
+document.getElementById("serviceTime").value=
+now.toTimeString().slice(0,5);
+
+}
+
+
+document.getElementById("serviceCustomer")
+?.addEventListener("change",function(){
+
+let customer=customers.find(
+c=>c.id==this.value
+);
+
+if(customer){
+
+document.getElementById("serviceAddress").value=
+customer.address || "";
+
+}
+
+});
+
+
+function saveService(){
+
+let customerId=
+document.getElementById("serviceCustomer").value;
+
+let customer=
+customers.find(c=>c.id==customerId);
+
+if(!customer){
+
+alert("Önce müşteri seçin.");
+return;
+
+}
+
+let service={
+
+id:Date.now(),
+
+customerId:customer.id,
+
+customerName:customer.name,
+
+customerPhone:customer.phone,
+
+date:document.getElementById("serviceDate").value,
+
+time:document.getElementById("serviceTime").value,
+
+address:document.getElementById("serviceAddress").value,
+
+device:document.getElementById("deviceType").value,
+
+brand:document.getElementById("brand").value,
+
+model:document.getElementById("model").value,
+
+complaint:document.getElementById("complaint").value,
+
+diagnosis:document.getElementById("diagnosis").value,
+
+workDone:document.getElementById("workDone").value,
+
+price:document.getElementById("price").value,
+
+status:document.getElementById("serviceStatus").value
+
+};
+
+services.unshift(service);
+
+saveData();
+
+alert("Servis kaydedildi.");
+
+showServiceForm(service);
+
+}
+
+
+function renderCustomers(){
+
+let list=document.getElementById("customerList");
+
+let search=
+(document.getElementById("customerSearch")?.value || "")
+.toLowerCase();
+
+let filtered=customers.filter(c=>
+(c.name||"").toLowerCase().includes(search) ||
+(c.phone||"").includes(search)
+);
+
+if(filtered.length===0){
+
+list.innerHTML=
+'<div class="empty">Müşteri bulunamadı.</div>';
+
+return;
+
+}
+
+list.innerHTML=filtered.map(c=>`
+
+<div class="customer">
+
+<b>${escapeHtml(c.name)}</b>
+
+<span>📞 ${escapeHtml(c.phone||"-")}</span><br>
+
+<span>📍 ${escapeHtml(c.address||"-")}</span>
+
+<div class="form-actions">
+
+<button class="primary"
+onclick="newServiceFor(${c.id})">
+🔧 Servis
+</button>
+
+<button class="secondary"
+onclick="callCustomer('${escapeAttr(c.phone||"")}')">
+📞 Ara
+</button>
+
+</div>
+
+</div>
+
+`).join("");
+
+}
+
+
+function newServiceFor(id){
+
+showPage("newService");
+
+setTimeout(()=>{
+
+document.getElementById("serviceCustomer").value=id;
+
+let customer=customers.find(c=>c.id==id);
+
+if(customer)
+document.getElementById("serviceAddress").value=
+customer.address||"";
+
+},100);
+
+}
+
+
+function callCustomer(phone){
+
+if(phone)
+location.href="tel:"+phone;
+
+}
+
+
+function renderServices(){
+
+let list=document.getElementById("serviceList");
+
+let search=
+(document.getElementById("serviceSearch")?.value||"")
+.toLowerCase();
+
+let filtered=services.filter(s=>
+
+(s.customerName||"").toLowerCase().includes(search) ||
+
+(s.customerPhone||"").includes(search) ||
+
+(s.device||"").toLowerCase().includes(search) ||
+
+(s.brand||"").toLowerCase().includes(search)
+
+);
+
+if(filtered.length===0){
+
+list.innerHTML=
+'<div class="empty">Henüz servis kaydı yok.</div>';
+
+return;
+
+}
+
+list.innerHTML=filtered.map(s=>`
+
+<div class="service">
+
+<h3>${escapeHtml(s.customerName)}</h3>
+
+📅 ${escapeHtml(s.date||"-")}
+&nbsp;
+🕐 ${escapeHtml(s.time||"-")}<br>
+
+🔧 ${escapeHtml(s.device||"-")}
+${s.brand ? " • "+escapeHtml(s.brand):""}
+${s.model ? " • "+escapeHtml(s.model):""}<br>
+
+📍 ${escapeHtml(s.address||"-")}<br>
+
+💰 ${escapeHtml(s.price||"0")} ₺
+
+<br><br>
+
+<span class="status">
+${escapeHtml(s.status||"Bekliyor")}
+</span>
+
+<div class="form-actions">
+
+<button class="primary"
+onclick="showServiceFormById(${s.id})">
+📄 Servis Formu
+</button>
+
+<button class="secondary"
+onclick="callCustomer('${escapeAttr(s.customerPhone||"")}')">
+📞 Ara
+</button>
+
+</div>
+
+</div>
+
+`).join("");
+
+}
+
+
+function showServiceFormById(id){
+
+let service=services.find(s=>s.id===id);
+
+if(service)
+showServiceForm(service);
+
+}
+
+
+function showServiceForm(s){
+
+document.getElementById("formContent").innerHTML=`
+
+<p><b>Müşteri:</b> ${escapeHtml(s.customerName)}</p>
+
+<p><b>Telefon:</b> ${escapeHtml(s.customerPhone||"-")}</p>
+
+<p><b>Tarih:</b> ${escapeHtml(s.date||"-")}</p>
+
+<p><b>Saat:</b> ${escapeHtml(s.time||"-")}</p>
+
+<p><b>Adres:</b> ${escapeHtml(s.address||"-")}</p>
+
+<p><b>Cihaz:</b> ${escapeHtml(s.device||"-")}</p>
+
+<p><b>Marka:</b> ${escapeHtml(s.brand||"-")}</p>
+
+<p><b>Model:</b> ${escapeHtml(s.model||"-")}</p>
+
+<p><b>Müşteri Şikayeti:</b><br>
+${escapeHtml(s.complaint||"-")}</p>
+
+<p><b>Arıza / Tespit:</b><br>
+${escapeHtml(s.diagnosis||"-")}</p>
+
+<p><b>Yapılan İşlem:</b><br>
+${escapeHtml(s.workDone||"-")}</p>
+
+<p><b>Ücret:</b> ${escapeHtml(s.price||"0")} ₺</p>
+
+<p><b>Durum:</b> ${escapeHtml(s.status||"-")}</p>
+
+`;
+
+showPage("serviceForm");
+
+}
+
+
+function updateStats(){
+
+document.getElementById("customerCount").textContent=
+customers.length;
+
+document.getElementById("serviceCount").textContent=
+services.length;
+
+}
+
+
+function escapeHtml(text){
+
+return String(text??"")
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
+
+}
+
+
+function escapeAttr(text){
+
+return String(text??"")
+.replaceAll("'","")
+.replaceAll('"',"");
+
+}
+
+
+updateStats();
+
+</script>
+
 </body>
 </html>
