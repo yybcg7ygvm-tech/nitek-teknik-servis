@@ -50,7 +50,7 @@ function renderHome(){
   if(r) r.innerHTML=serviceData.slice(0,5).map(serviceCard).join("")||'<div class="empty">Henüz servis kaydı yok.</div>';
 }
 function serviceCard(s){
-  return `<div class="item"><strong>${esc(s.customer_name)}</strong><div>📅 ${esc(s.service_date||"")} ${esc(s.service_time||"")} · ${esc(s.device)} · ${esc(s.brand)} ${esc(s.model)}</div><div class="muted">${esc(s.type)} · ${esc(s.complaint||"")}</div><div class="muted">💰 ${money(s.total)} · ${esc(s.payment||"")}</div><div class="row"><button onclick="openServiceDetail('${s.id}')">Detay</button><button class="light" onclick="deleteService('${s.id}')">🗑️ Sil</button><button onclick="makePDF('${s.id}')">PDF</button></div></div>`;
+  return `<div class="item"><strong>${esc(s.customer_name)}</strong><div>📅 ${esc(s.service_date||"")} ${esc(s.service_time||"")} · ${esc(s.device)} · ${esc(s.brand)} ${esc(s.model)}</div><div class="muted">${esc(s.type)} · ${esc(s.complaint||"")}</div><div class="muted">💰 ${money(s.total)} · ${esc(s.payment||"")}</div><div class="row"><button onclick="openServiceDetail('${s.id}')">Detay</button><button onclick="makePDF('${s.id}')">PDF</button></div></div>`;
 }
 
 window.customers=function(){
@@ -151,24 +151,51 @@ window.openServiceDetail=function(id){
 };
 
 window.faults=function(){
+  const b=$("faultBrand"),m=$("faultModel"),c=$("faultCode");
+  if(!b||!m||!c)return;
+  const guide=window.NITEK_FAULT_GUIDE?.models||{};
+  const brands=Object.keys(guide);
+  b.innerHTML='<option value="">Marka seç</option>'+
+    brands.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");
+  m.innerHTML='<option value="">Önce marka seç</option>';
+  c.innerHTML='<option value="">Önce model seç</option>';
+  $("faultDetail").innerHTML="";
+  $("faultList").innerHTML="";
+};
+
+window.faultModelList=function(){
+  const b=$("faultBrand"),m=$("faultModel"),c=$("faultCode");
+  if(!b||!m||!c)return;
+  const models=window.NITEK_FAULT_GUIDE?.models?.[b.value]||{};
+  m.innerHTML='<option value="">Model seç</option>'+Object.keys(models).map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");
+  c.innerHTML='<option value="">Önce model seç</option>';
+  $("faultDetail").innerHTML="";
+  faultSearchRender();
+};
+
+window.faultCodeList=function(){
+  const b=$("faultBrand"),m=$("faultModel"),c=$("faultCode");
+  const codes=window.NITEK_FAULT_GUIDE?.models?.[b.value]?.[m.value]?.codes||[];
+  c.innerHTML='<option value="">Arıza kodu seç</option>'+codes.map(x=>`<option value="${esc(x[0])}">${esc(x[0])}</option>`).join("");
+  $("faultDetail").innerHTML="";
+  faultSearchRender();
+};
+
+window.faultShowCode=function(){
+  const b=$("faultBrand"),m=$("faultModel"),c=$("faultCode");
+  const item=(window.NITEK_FAULT_GUIDE?.models?.[b.value]?.[m.value]?.codes||[]).find(x=>x[0]===c.value);
+  if(!item){$("faultDetail").innerHTML="";return;}
+  $("faultDetail").innerHTML=`<div class="item"><h3>🔴 ${esc(item[0])}</h3><p><b>Arıza:</b> ${esc(item[1])}</p><p><b>Muhtemel neden:</b> ${esc(item[2])}</p><p><b>Kontrol / rehber:</b> ${esc(item[3])}</p></div>`;
+};
+
+function faultSearchRender(){
   const q=($("faultSearch")?.value||"").toLocaleLowerCase("tr-TR");
-  const list=(window.NITEK_DATA?.faults||[]).filter(x=>x.join(" ").toLocaleLowerCase("tr-TR").includes(q));
+  const b=$("faultBrand")?.value,m=$("faultModel")?.value;
+  const codes=window.NITEK_FAULT_GUIDE?.models?.[b]?.[m]?.codes||[];
+  if(!q){$("faultList").innerHTML="";return;}
+  const list=codes.filter(x=>x.join(" ").toLocaleLowerCase("tr-TR").includes(q));
   $("faultList").innerHTML=list.map(x=>`<div class="item"><strong>🔥 ${esc(x[0])}</strong><div>${esc(x[1])}</div><small>${esc(x[2])}</small></div>`).join("")||'<div class="empty">Arıza kodu bulunamadı.</div>';
-};
-
-window.deleteService=async function(id){
-  const s=serviceData.find(x=>x.id===id);
-  if(!s)return;
-  if(!confirm("Bu servis kaydını silmek istediğine emin misin?"))return;
-
-  const {error}=await db.from("services").delete().eq("id",id);
-  if(error){
-    alert("Servis kaydı silinemedi: "+error.message);
-    return;
-  }
-  await loadAll();
-  show("services");
-};
+}
 
 window.reports=function(){
   const total=serviceData.reduce((a,s)=>a+Number(s.total||0),0);
@@ -185,5 +212,5 @@ window.makePDF=function(id){
 
 document.addEventListener("DOMContentLoaded",()=>{
   const d=new Date();if($("date"))$("date").value=d.toISOString().slice(0,10);if($("time"))$("time").value=d.toTimeString().slice(0,5);
-  brandList();serviceType();boot();
+  brandList();serviceType();faults();boot();
 });
