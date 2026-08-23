@@ -1,5 +1,83 @@
-const cfg=window.NITEK_CONFIG;const sb=supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_PUBLISHABLE_KEY);const $=id=>document.getElementById(id);function m(x){$("msg").textContent=x}
-$("loginBtn").onclick=async()=>{let email=$("email").value.trim(),password=$("pass").value;if(!email||!password)return m("E-posta ve şifre gerekli.");m("Giriş yapılıyor...");let {error}=await sb.auth.signInWithPassword({email,password});if(error)m(error.message);else location.href="index.html"};
-$("signupBtn").onclick=async()=>{let email=$("email").value.trim(),password=$("pass").value;if(!email||password.length<6)return m("E-posta gir ve en az 6 karakterli şifre kullan.");m("Kayıt oluşturuluyor...");let {data,error}=await sb.auth.signUp({email,password});if(error)return m(error.message);if(data.session)location.href="index.html";else m("Kayıt tamam. E-postana gelen doğrulama bağlantısını aç, sonra giriş yap.")};
-$("resetBtn").onclick=async()=>{let email=$("email").value.trim();if(!email)return m("Önce e-postanı yaz.");let {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});m(error?error.message:"Şifre sıfırlama e-postası gönderildi.")};
-document.getElementById("logoBox").innerHTML='<div class="fallback-logo">N</div>';
+const cfg = window.NITEK_CONFIG;
+
+const sb = window.supabase.createClient(
+  cfg.SUPABASE_URL,
+  cfg.SUPABASE_PUBLISHABLE_KEY
+);
+
+const msg = document.getElementById("msg");
+
+function mesaj(yazi) {
+  msg.textContent = yazi;
+}
+
+document.getElementById("loginBtn").onclick = async function () {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("pass").value;
+
+  if (!email || !password) {
+    mesaj("E-posta ve şifre gerekli.");
+    return;
+  }
+
+  mesaj("Giriş yapılıyor...");
+
+  const { error } = await sb.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
+
+  if (error) {
+    mesaj("Hata: " + error.message);
+    return;
+  }
+
+  window.location.href = "index.html";
+};
+
+document.getElementById("signupBtn").onclick = async function () {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("pass").value;
+
+  if (!email || password.length < 6) {
+    mesaj("En az 6 karakterli şifre gir.");
+    return;
+  }
+
+  mesaj("Kayıt oluşturuluyor...");
+
+  const { data, error } = await sb.auth.signUp({
+    email: email,
+    password: password
+  });
+
+  if (error) {
+    mesaj("Hata: " + error.message);
+    return;
+  }
+
+  if (data.session) {
+    window.location.href = "index.html";
+  } else {
+    mesaj("Kayıt tamamlandı. E-postanı doğrula, sonra giriş yap.");
+  }
+};
+
+document.getElementById("resetBtn").onclick = async function () {
+  const email = document.getElementById("email").value.trim();
+
+  if (!email) {
+    mesaj("Önce e-postanı yaz.");
+    return;
+  }
+
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: "https://yybcg7ygvm-tech.github.io/nitek-teknik-servis/"
+  });
+
+  mesaj(
+    error
+      ? "Hata: " + error.message
+      : "Şifre sıfırlama e-postası gönderildi."
+  );
+};
