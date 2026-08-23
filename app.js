@@ -151,10 +151,48 @@ window.openServiceDetail=function(id){
 };
 
 window.faults=function(){
-  const q=($("faultSearch")?.value||"").toLocaleLowerCase("tr-TR");
-  const list=(window.NITEK_DATA?.faults||[]).filter(x=>x.join(" ").toLocaleLowerCase("tr-TR").includes(q));
-  $("faultList").innerHTML=list.map(x=>`<div class="item"><strong>🔥 ${esc(x[0])}</strong><div>${esc(x[1])}</div><small>${esc(x[2])}</small></div>`).join("")||'<div class="empty">Arıza kodu bulunamadı.</div>';
+  const brands=Object.keys(window.NITEK_FAULT_GUIDE?.models||{});
+  const b=$("faultBrand");
+  if(!b)return;
+  const current=b.value;
+  b.innerHTML='<option value="">Marka seç</option>'+brands.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");
+  if(current && brands.includes(current)) b.value=current;
+  faultModelList();
 };
+
+window.faultModelList=function(){
+  const b=$("faultBrand"),m=$("faultModel"),c=$("faultCode");
+  if(!b||!m||!c)return;
+  const models=window.NITEK_FAULT_GUIDE?.models?.[b.value]||{};
+  m.innerHTML='<option value="">Model seç</option>'+Object.keys(models).map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");
+  c.innerHTML='<option value="">Önce model seç</option>';
+  $("faultDetail").innerHTML="";
+  faultSearchRender();
+};
+
+window.faultCodeList=function(){
+  const b=$("faultBrand"),m=$("faultModel"),c=$("faultCode");
+  const codes=window.NITEK_FAULT_GUIDE?.models?.[b.value]?.[m.value]?.codes||[];
+  c.innerHTML='<option value="">Arıza kodu seç</option>'+codes.map(x=>`<option value="${esc(x[0])}">${esc(x[0])}</option>`).join("");
+  $("faultDetail").innerHTML="";
+  faultSearchRender();
+};
+
+window.faultShowCode=function(){
+  const b=$("faultBrand"),m=$("faultModel"),c=$("faultCode");
+  const item=(window.NITEK_FAULT_GUIDE?.models?.[b.value]?.[m.value]?.codes||[]).find(x=>x[0]===c.value);
+  if(!item){$("faultDetail").innerHTML="";return;}
+  $("faultDetail").innerHTML=`<div class="item"><h3>🔴 ${esc(item[0])}</h3><p><b>Arıza:</b> ${esc(item[1])}</p><p><b>Muhtemel neden:</b> ${esc(item[2])}</p><p><b>Kontrol / rehber:</b> ${esc(item[3])}</p></div>`;
+};
+
+function faultSearchRender(){
+  const q=($("faultSearch")?.value||"").toLocaleLowerCase("tr-TR");
+  const b=$("faultBrand")?.value,m=$("faultModel")?.value;
+  const codes=window.NITEK_FAULT_GUIDE?.models?.[b]?.[m]?.codes||[];
+  if(!q){$("faultList").innerHTML="";return;}
+  const list=codes.filter(x=>x.join(" ").toLocaleLowerCase("tr-TR").includes(q));
+  $("faultList").innerHTML=list.map(x=>`<div class="item"><strong>🔥 ${esc(x[0])}</strong><div>${esc(x[1])}</div><small>${esc(x[2])}</small></div>`).join("")||'<div class="empty">Arıza kodu bulunamadı.</div>';
+}
 
 window.reports=function(){
   const total=serviceData.reduce((a,s)=>a+Number(s.total||0),0);
@@ -171,5 +209,5 @@ window.makePDF=function(id){
 
 document.addEventListener("DOMContentLoaded",()=>{
   const d=new Date();if($("date"))$("date").value=d.toISOString().slice(0,10);if($("time"))$("time").value=d.toTimeString().slice(0,5);
-  brandList();serviceType();boot();
+  brandList();serviceType();faults();boot();
 });
