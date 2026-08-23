@@ -1,0 +1,7 @@
+NİTEK PRO V12 - MODEL BAZLI KOMBİ ARIZA KATALOĞU
+
+Katalog: 32 marka/model kombinasyonu, 130 başlangıç kod kaydı.
+
+Arama: Marka -> Model -> Kod/açıklama.
+
+Önemli: Bu katalog saha kullanımını hızlandıran başlangıç kütüphanesidir. Aynı arıza kodu farklı model/nesillerde farklı anlam taşıyabildiği için üretici servis/kullanım kılavuzu esas alınmalıdır. Bir sonraki veri güncellemesinde model bazlı kod sayısı genişletilebilir.
