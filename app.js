@@ -214,3 +214,6 @@ document.addEventListener("DOMContentLoaded",()=>{
   const d=new Date();if($("date"))$("date").value=d.toISOString().slice(0,10);if($("time"))$("time").value=d.toTimeString().slice(0,5);
   brandList();serviceType();faults();boot();
 });
+  const d=new Date();if($("date"))$("date").value=d.toISOString().slice(0,10);if($("time"))$("time").value=d.toTimeString().slice(0,5);
+  brandList();serviceType();faults();boot();
+});
