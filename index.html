@@ -2,106 +2,201 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#07152f">
 <title>NİTEK Teknik Servis</title>
-<link rel="stylesheet" href="style.css">
-<script src="data.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f3f5f9;color:#101a2f}
+header{background:#07152f;color:#fff;padding:18px 18px 16px;position:sticky;top:0;z-index:10}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:58px;height:58px;object-fit:cover;border-radius:14px;background:#fff}
+.brand b{font-size:20px}.brand span{display:block;color:#c9d1df;margin-top:4px}
+main{max-width:900px;margin:auto;padding:18px}.card{background:#fff;border-radius:24px;padding:22px;margin-bottom:16px;box-shadow:0 5px 20px #0000000c}
+h1{font-size:30px;margin:0 0 8px}h2{margin:0 0 16px}.muted{color:#69758b}
+input,select,textarea{width:100%;padding:15px;border:1px solid #d7dce5;border-radius:14px;font-size:16px;margin:7px 0;background:#fff}
+button{border:0;border-radius:14px;padding:14px 18px;font-size:16px;font-weight:700;cursor:pointer}
+.primary{background:#07152f;color:#fff}.blue{background:#0788f5;color:#fff}.light{background:#eef2f7;color:#13203a}.danger{background:#d71920;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.hide{display:none}
+.nav{display:flex;gap:8px;overflow:auto;margin-bottom:16px}.nav button{white-space:nowrap}
+.check{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid #e1e5ec;border-radius:14px;margin:8px 0}
+.check input{width:22px;height:22px;margin:0}.check.done{background:#edf9f0;border-color:#8bd39a}
+.result{padding:14px;border:1px solid #e0e4eb;border-radius:14px;margin:8px 0}.result b{color:#d71920}
+.small{font-size:13px}.top-actions{display:flex;gap:8px;margin:12px 0}
+@media(max-width:600px){main{padding:12px}.grid{grid-template-columns:1fr}h1{font-size:27px}}
+</style>
+<style>.badge{display:inline-block;padding:5px 9px;border-radius:999px;background:#edf1f6}.top-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.check{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid #dfe4ec;border-radius:12px;margin:7px 0}.check input{width:20px;height:20px}</style></head>
 <body>
 <header>
-<div class="header-inner">
-<div class="header-title"><b>NİTEK TEKNİK SERVİS</b><span>Kombi • Klima • Bakım • Onarım</span></div>
-<button class="light" onclick="logout()">Çıkış</button>
+<div class="brand">
+<div id="logoBox" class="logo"></div>
+<div><b>NİTEK TEKNİK SERVİS</b><span>Kombi • Klima • Bakım • Onarım • Montaj</span></div>
 </div>
 </header>
 
-<main class="container">
+<main>
+<section id="login" class="card">
+<h1>Servis Yönetim Sistemi</h1>
+<p class="muted">Temiz V25 • İnternet hesabı gerektirmeyen test sürümü</p>
+<input id="email" type="email" placeholder="E-posta">
+<input id="password" type="password" placeholder="Şifre">
+<button class="primary" style="width:100%" onclick="login()">Giriş Yap</button>
+<p id="loginMsg" class="small muted"></p>
+</section>
+
+<section id="app" class="hide">
 <div class="nav">
-<button class="primary" onclick="showPage('home')">Ana Sayfa</button>
-<button class="light" onclick="showPage('service')">🧾 Yeni Servis</button>
-<button class="light" onclick="showPage('faults')">🔥 Arıza Kodları</button>
-<button class="light" onclick="showPage('customers')">👤 Müşteriler</button>
+<button class="primary" onclick="show('home')">Ana Sayfa</button>
+<button class="light" onclick="show('service')">Yeni Servis</button>
+<button class="light" onclick="show('faults')">🔥 Arıza Kodları</button>
+<button class="light" onclick="show('maintenance')">🔧 Bakım</button>
 </div>
 
-<section id="home" class="page">
-<div class="card">
-<h1>Hoş geldin 👋</h1>
-<p class="muted">Kullanıcı: <b id="userName"></b></p>
+<div id="home" class="page">
+<div class="card"><h1>Hoş geldin 👋</h1><p class="muted">NİTEK Teknik Servis</p>
 <div class="grid">
-<button class="blue" onclick="showPage('service')">🧾 Yeni Servis</button>
-<button class="blue" onclick="showPage('faults')">🔥 Arıza Kodları</button>
-<button class="blue" onclick="showPage('customers')">👤 Müşteriler</button>
-<button class="light" onclick="showPage('catalog')">⚙️ Marka / Model</button>
-</div>
-</div>
-<div class="card"><h2>Özet</h2><div id="summary"></div></div>
-</section>
-
-<section id="service" class="page hidden">
-<div class="card">
-<h2>🧾 Yeni Servis</h2>
-<label>Müşteri</label><input id="serviceCustomer" placeholder="Müşteri adı soyadı">
-<label>Telefon</label><input id="servicePhone" placeholder="Telefon">
-<label>Adres</label><input id="serviceAddress" placeholder="Adres">
-
-<label>İşlem Türü</label>
-<select id="serviceType" onchange="serviceTypeChanged()">
-<option>Arıza</option><option>Bakım</option><option>Montaj</option><option>Diğer</option>
-</select>
-<label>Cihaz Türü</label>
-<select id="serviceDevice" onchange="serviceBrands()">
-<option>Kombi</option><option>Klima</option><option>Şofben</option><option>Diğer</option>
-</select>
-<label>Marka</label><select id="serviceBrand" onchange="serviceModels()"></select>
-<label>Model</label><select id="serviceModel"></select>
-
-<div id="faultBox">
-<label>Müşteri Şikâyeti / Arıza</label><textarea id="serviceComplaint" placeholder="Müşterinin şikâyeti"></textarea>
+<button class="blue" onclick="show('service')">+ Yeni Servis</button>
+<button class="blue" onclick="show('faults')">🔥 Kombi Arıza Kodları</button>
+<button class="blue" onclick="show('maintenance')">🔧 Bakım Kontrolü</button>
+<button class="light" onclick="show('brands')">⚙ Marka / Model</button>
+</div></div>
+<div class="card"><h2>Bugünkü Özet</h2><div id="summary"></div></div>
 </div>
 
-<div id="maintenanceBox" class="hidden">
-<h3>🛠️ Bakım Kontrolleri</h3>
-<p class="muted">Sadece işaretlediğin kontroller PDF'e yazılır.</p>
-<div id="maintenanceChecks"></div>
-<div class="actions"><button class="light" onclick="checkAll(true)">☑️ Hepsini İşaretle</button><button class="light" onclick="checkAll(false)">⬜ Temizle</button></div>
+<div id="service" class="page hide">
+<div class="card"><h2>Yeni Servis</h2>
+<input id="customer" placeholder="Müşteri adı soyadı">
+<input id="phone" placeholder="Telefon">
+<input id="address" placeholder="Adres">
+<select id="serviceType" onchange="updateServiceType()"><option value="Arıza">🔴 Arıza</option><option value="Bakım">🔧 Bakım</option></select>
+<select id="brand" onchange="models()"></select>
+<select id="model"></select>
+<div id="maintenanceInService" class="hide" style="margin-top:10px">
+<h3>🔧 Bakım Kontrolleri</h3>
+<p class="muted">Yaptığın kontrolleri işaretle. Servis kaydına ve PDF'e yalnızca işaretlediklerin yazılır.</p>
+<div id="serviceChecks"></div>
 </div>
+<div id="faultNote"><textarea id="notes" placeholder="Müşteri şikâyeti / arıza açıklaması"></textarea></div>
+<textarea id="workNote" placeholder="Yapılan işlem / teknisyen notu"></textarea>
+<div class="top-actions"><button class="primary" onclick="saveService()">Servisi Kaydet</button><button class="light" onclick="show('home')">İptal</button></div>
+</div></div>
 
-<label>Tarih</label><input id="serviceDate" type="date">
-<label>Saat</label><input id="serviceTime" type="time">
-<label>Yapılan İşlem / Teknisyen Notu</label><textarea id="serviceWork"></textarea>
-<label>Ücret (₺)</label><input id="servicePrice" type="number" min="0" placeholder="0">
-<div class="actions"><button class="primary" onclick="saveService()">💾 Servisi Kaydet + PDF</button><button class="light" onclick="showPage('home')">Geri</button></div>
-</div>
-</section>
+<div id="services" class="page hide">
+<div class="card"><h2>📋 Servis Kayıtları</h2><p class="muted">Kaydettiğin tüm servisler burada görünür.</p><input id="serviceSearch" oninput="renderServices()" placeholder="🔎 Müşteri, marka, model veya işlem ara">
+<div id="serviceList"></div><button class="light" onclick="show('home')">Geri</button></div></div>
 
-<section id="faults" class="page hidden">
-<div class="card"><h2>🔥 Kombi Arıza Kodları</h2><input id="faultSearch" oninput="renderFaults()" placeholder="Kod veya açıklama ara">
+<div id="faults" class="page hide">
+<div class="card"><h2>🔥 Kombi Arıza Kodları</h2>
+<input id="faultSearch" oninput="renderFaults()" placeholder="Kod veya açıklama ara (örn. E01)">
 <div id="faultList"></div></div>
-</section>
+</div>
 
-<section id="customers" class="page hidden">
-<div class="card"><h2>👤 Müşteriler</h2>
-<input id="customerSearch" oninput="renderCustomers()" placeholder="Müşteri / telefon ara">
-<button class="blue" onclick="newCustomer()">＋ Yeni Müşteri</button>
-<div id="customerList"></div></div>
-</section>
+<div id="maintenance" class="page hide">
+<div class="card"><h2>🔧 Bakım Kontrol Listesi</h2>
+<p class="muted">Yaptığın kontrolleri işaretle. İşaretler cihazında kaydedilir.</p>
+<div id="checks"></div>
+<button class="primary" onclick="saveMaintenance()">Kontrolleri Kaydet</button>
+</div>
+</div>
 
-<section id="history" class="page hidden">
-<div class="card"><h2>📋 Müşteri Geçmişi</h2><div id="historyTitle"></div><hr><div id="historyList"></div>
-<button class="light" onclick="showPage('customers')">Geri</button></div>
-</section>
-
-<section id="catalog" class="page hidden">
-<div class="card"><h2>⚙️ Marka / Model</h2>
-<label>Cihaz Türü</label><select id="catalogDevice"><option>Kombi</option><option>Klima</option><option>Şofben</option><option>Diğer</option></select>
+<div id="brands" class="page hide">
+<div class="card"><h2>⚙ Marka / Model</h2>
+<p class="muted">Listede yoksa kendi marka ve modelini ekleyebilirsin.</p>
 <input id="newBrand" placeholder="Yeni marka">
-<input id="newModel" placeholder="Yeni model">
-<button class="blue" onclick="addBrandModel()">＋ Marka / Model Ekle</button>
-<p class="muted">Eklediğin marka ve modeller bu telefonda saklanır.</p>
-</div></section>
+<input id="newModel" placeholder="Model">
+<button class="blue" onclick="addBrand()">Ekle</button>
+<div id="brandList" style="margin-top:15px"></div>
+</div></div>
+</section>
 </main>
-<script src="app.js"></script>
+
+<script>
+"use strict";
+const KEY="nitek_v25_data";
+const faults=[
+["E01","Ateşleme / alev oluşmuyor","Gaz vanası, ateşleme elektrodu, iyonizasyon ve gaz basıncı kontrol edilir."],
+["E02","Aşırı ısınma","Pompa, tesisat suyu, filtre ve sıcaklık sensörü kontrol edilir."],
+["E03","Baca / hava akışı","Fan, baca hattı, hava basınç sensörü ve bağlantılar kontrol edilir."],
+["E04","Alev sinyali / iyonizasyon","İyonizasyon elektrodu ve topraklama kontrol edilir."],
+["E05","Kalorifer sıcaklık sensörü","NTC sensörü ve kablosu kontrol edilir."],
+["E06","Kullanım suyu sensörü","DHW NTC sensörü ve bağlantısı kontrol edilir."],
+["E10","Düşük su basıncı","Tesisat basıncı ve kaçak ihtimali kontrol edilir."],
+["E25","Pompa / sirkülasyon","Pompa çalışması, hava ve tesisat akışı kontrol edilir."],
+["F28","Ateşleme başarısız","Gaz beslemesi, ateşleme ve iyonizasyon kontrol edilir."],
+["F29","Çalışma sırasında alev kesilmesi","Gaz, baca ve iyonizasyon sistemi kontrol edilir."]
+];
+const checks=["Cihaz genel görsel kontrolü","Gaz bağlantısı ve gaz kaçağı kontrolü","Tesisat su basıncı kontrolü","Baca bağlantısı ve baca çekiş kontrolü","Yanma / alev kontrolü","İyonizasyon elektrodu kontrolü","Ateşleme elektrodu kontrolü","Fan ve hava akışı kontrolü","Pompa çalışma kontrolü","Kalorifer filtresi kontrolü","Genleşme tankı kontrolü","Kalorifer NTC sensörü kontrolü","Kullanım suyu NTC sensörü kontrolü","Eşanjör / ısı transferi kontrolü","Elektrik bağlantıları ve topraklama kontrolü","Cihaz çalışma testi"];
+let data=JSON.parse(localStorage.getItem(KEY)||'null')||{brands:{Demirdöküm:["Neva","Nitromix","Atron"],Vaillant:["ecoTEC","turboTEC"],"E.C.A":["Proteus","Confeo"],Baymak:["Luna","Duo Tec"],Bosch:["Condens"]},services:[],done:[]};
+
+function persist(){localStorage.setItem(KEY,JSON.stringify(data))}
+function login(){
+ const e=document.getElementById("email").value.trim(),p=document.getElementById("password").value;
+ const msg=document.getElementById("loginMsg");
+ if(!e||!p){msg.textContent="E-posta ve şifreyi gir.";return}
+ msg.textContent="Giriş başarılı. Açılıyor…";
+ setTimeout(()=>{document.getElementById("login").classList.add("hide");document.getElementById("app").classList.remove("hide");init()},250);
+}
+function show(id){document.querySelectorAll(".page").forEach(x=>x.classList.add("hide"));const el=document.getElementById(id);if(el)el.classList.remove("hide");if(id==="faults")renderFaults();if(id==="brands")renderBrands();if(id==="maintenance")renderChecks();if(id==="services")renderServices();if(id==="service"){fillBrands();updateServiceType()}}
+function init(){fillBrands();renderFaults();renderChecks();renderSummary();renderServices();}
+function fillBrands(){const s=document.getElementById("brand");s.innerHTML=Object.keys(data.brands).map(x=>`<option>${x}</option>`).join("");models()}
+function models(){const b=document.getElementById("brand").value;document.getElementById("model").innerHTML=(data.brands[b]||[]).map(x=>`<option>${x}</option>`).join("")}
+function saveService(){
+ const c=document.getElementById("customer").value.trim();
+ if(!c){alert("Müşteri adı gerekli.");return}
+ const type=document.getElementById("serviceType").value;
+ const selected=type==="Bakım"?[...document.querySelectorAll("#serviceChecks input[type=checkbox]:checked")].map(x=>x.dataset.name):[];
+ const rec={
+  id:Date.now(),customer:c,phone:document.getElementById("phone").value.trim(),address:document.getElementById("address").value.trim(),
+  type,brand:document.getElementById("brand").value,model:document.getElementById("model").value,
+  notes:document.getElementById("notes").value.trim(),work:document.getElementById("workNote").value.trim(),
+  checks:selected,date:new Date().toLocaleString("tr-TR")
+ };
+ data.services.unshift(rec);
+ persist();
+ renderSummary();
+ renderServices();
+ alert("✅ Servis başarıyla kaydedildi.");
+ document.getElementById("customer").value="";document.getElementById("phone").value="";document.getElementById("address").value="";document.getElementById("notes").value="";document.getElementById("workNote").value="";
+ show("services");
+}
+function updateServiceType(){
+ const type=document.getElementById("serviceType")?.value||"Arıza";
+ const box=document.getElementById("maintenanceInService");
+ if(!box)return;
+ box.classList.toggle("hide",type!=="Bakım");
+ if(type==="Bakım") renderServiceChecks();
+}
+function renderServiceChecks(){
+ const box=document.getElementById("serviceChecks");
+ if(!box)return;
+ box.innerHTML=checks.map((x,i)=>`<label class="check"><input type="checkbox" data-name="${x.replace(/"/g,'&quot;')}"> <span>${x}</span></label>`).join("");
+}
+function renderServices(){
+ const list=document.getElementById("serviceList"); if(!list)return;
+ const q=(document.getElementById("serviceSearch")?.value||"").toLocaleLowerCase("tr-TR");
+ const arr=data.services.filter(s=>(s.customer+" "+s.phone+" "+s.brand+" "+s.model+" "+s.type+" "+s.notes+" "+s.work+" "+(s.checks||[]).join(" ")).toLocaleLowerCase("tr-TR").includes(q));
+ list.innerHTML=arr.map(s=>`<div class="result" style="margin:10px 0;padding:14px;border:1px solid #dfe4ec;border-radius:14px;background:#fff">
+ <div style="display:flex;justify-content:space-between;gap:8px"><b>${s.type==="Bakım"?"🔧":"🔴"} ${s.customer}</b><span class="badge">${s.type||"Arıza"}</span></div>
+ <div class="small">📞 ${s.phone||"-"} · ${s.brand||""} ${s.model||""} · ${s.date||""}</div>
+ ${s.notes?`<div><b>Şikâyet:</b> ${s.notes}</div>`:""}
+ ${s.work?`<div><b>Yapılan işlem:</b> ${s.work}</div>`:""}
+ ${s.checks?.length?`<div style="margin-top:8px"><b>✓ Yapılan bakım kontrolleri:</b><ul>${s.checks.map(x=>`<li>${x}</li>`).join("")}</ul></div>`:""}
+ <div class="top-actions"><button onclick="makeLocalPDF(${s.id})">📄 PDF</button><button onclick="deleteLocalService(${s.id})">🗑 Sil</button></div>
+ </div>`).join("")||"<p>Henüz servis kaydı yok.</p>";
+}
+function deleteLocalService(id){if(!confirm("Bu servis kaydını silmek istiyor musun?"))return;data.services=data.services.filter(x=>x.id!==id);persist();renderSummary();renderServices();}
+function makeLocalPDF(id){
+ const s=data.services.find(x=>x.id===id);if(!s)return;
+ const checksHtml=s.checks?.length?`<h3>Yapılan Bakım Kontrolleri</h3><ul>${s.checks.map(x=>`<li>✓ ${x}</li>`).join("")}</ul>`:"";
+ const w=window.open("","_blank");
+ if(!w){alert("PDF için açılır pencereye izin ver.");return;}
+ w.document.write(`<!doctype html><html lang="tr"><head><meta charset="utf-8"><title>NİTEK Servis Formu</title><style>body{font-family:Arial;padding:28px;color:#172033}h1{color:#07152f}hr{border:0;border-top:1px solid #ddd}li{margin:7px 0}.btn{position:fixed;right:15px;top:15px;padding:12px;background:#07152f;color:#fff;border:0;border-radius:10px}@media print{.btn{display:none}}</style></head><body><button class="btn" onclick="print()">🖨 PDF / Yazdır</button><h1>NİTEK TEKNİK SERVİS</h1><h2>SERVİS FORMU</h2><p><b>Tarih:</b> ${s.date||""}</p><hr><h3>Müşteri</h3><p>${s.customer||""}<br>${s.phone||""}<br>${s.address||""}</p><h3>Cihaz</h3><p>${s.brand||""} ${s.model||""}</p><h3>İşlem Türü</h3><p>${s.type||"Arıza"}</p>${s.notes?`<h3>Müşteri Şikâyeti / Arıza</h3><p>${s.notes}</p>`:""}${checksHtml}${s.work?`<h3>Yapılan İşlem</h3><p>${s.work}</p>`:""}<div style="margin-top:60px;display:flex;justify-content:space-between"><span>Müşteri İmzası: __________</span><span>Teknisyen: __________</span></div></body></html>`);w.document.close();setTimeout(()=>{try{w.focus();w.print()}catch(e){}},400);
+}
+function renderSummary(){document.getElementById("summary").innerHTML=`Toplam servis: <b>${data.services.length}</b><br>Bakım kontrolü: <b>${data.done.filter(Boolean).length}/${checks.length}</b>`}
+function renderFaults(){const q=(document.getElementById("faultSearch")?.value||"").toLowerCase();document.getElementById("faultList").innerHTML=faults.filter(f=>f.join(" ").toLowerCase().includes(q)).map(f=>`<div class="result"><b>${f[0]}</b> — ${f[1]}<div class="small">${f[2]}</div></div>`).join("")||"<p>Arıza kodu bulunamadı.</p>"}
+function renderChecks(){document.getElementById("checks").innerHTML=checks.map((x,i)=>`<label class="check ${data.done[i]?'done':''}"><input type="checkbox" ${data.done[i]?'checked':''} onchange="toggleCheck(${i},this.checked)"> <span>${x}</span></label>`).join("")}
+function toggleCheck(i,v){data.done[i]=v;persist();renderChecks();renderSummary()}
+function saveMaintenance(){persist();alert("Bakım kontrol sonuçları kaydedildi.");}
+function addBrand(){const b=document.getElementById("newBrand").value.trim(),m=document.getElementById("newModel").value.trim();if(!b||!m){alert("Marka ve model gir.");return}if(!data.brands[b])data.brands[b]=[];data.brands[b].push(m);persist();document.getElementById("newBrand").value="";document.getElementById("newModel").value="";fillBrands();renderBrands()}
+function renderBrands(){document.getElementById("brandList").innerHTML=Object.entries(data.brands).map(([b,ms])=>`<div class="result"><b>${b}</b><br>${ms.join(", ")}</div>`).join("")}
+</script>
 </body>
 </html>

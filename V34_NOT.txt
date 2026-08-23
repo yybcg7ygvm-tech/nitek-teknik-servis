@@ -1,0 +1,1 @@
+V34: Eski çalışan V25 tabanı korunarak servis tipi Arıza/Bakım, bakım checklisti, servis kayıtları listesi ve PDF eklendi. Kayıt sonrası Servis Kayıtları açılır.
