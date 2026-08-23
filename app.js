@@ -14,6 +14,7 @@ window.show = function(page){
   if(page==="customers") window.customers();
   if(page==="services") window.services();
   if(page==="faults") window.faults();
+  if(page==="reports") window.reports();
 };
 
 window.logout = async function(){
@@ -48,6 +49,7 @@ async function loadAll(){
   renderHome();
   window.customers();
   window.services();
+  window.reports();
 }
 
 function renderHome(){
@@ -230,6 +232,48 @@ window.openServiceDetail=function(id){
     <div class="row"><button class="primary" onclick="makePDF('${s.id}')">📄 PDF Oluştur</button></div>
   </div>`;
   show("detail");
+};
+
+
+window.reports = function(){
+  const total = serviceData.reduce((a,s)=>a+Number(s.total||0),0);
+  const labor = serviceData.reduce((a,s)=>a+Number(s.labor||0),0);
+  const parts = serviceData.reduce((a,s)=>a+Number(s.parts||0),0);
+  const maintenance = serviceData.filter(s=>s.type==="Bakım").length;
+  const faults = serviceData.filter(s=>s.type==="Arıza").length;
+  const montaj = serviceData.filter(s=>s.type==="Montaj").length;
+  const kontrol = serviceData.filter(s=>s.type==="Kontrol").length;
+
+  const host = $("reportStats") || $("report") || $("reportsContent");
+  if(!host) return;
+
+  const byDevice = {};
+  serviceData.forEach(s=>{
+    const key=s.device||"Diğer";
+    byDevice[key]=(byDevice[key]||0)+1;
+  });
+
+  host.innerHTML = `
+    <div class="grid">
+      <div class="card"><b>${customerData.length}</b><div>Müşteri</div></div>
+      <div class="card"><b>${serviceData.length}</b><div>Toplam Servis</div></div>
+      <div class="card"><b>${maintenance}</b><div>Bakım</div></div>
+      <div class="card"><b>${faults}</b><div>Arıza</div></div>
+      <div class="card"><b>${montaj}</b><div>Montaj</div></div>
+      <div class="card"><b>${kontrol}</b><div>Kontrol</div></div>
+      <div class="card"><b>${money(labor)}</b><div>İşçilik</div></div>
+      <div class="card"><b>${money(parts)}</b><div>Parça</div></div>
+      <div class="card"><b>${money(total)}</b><div>Toplam Ciro</div></div>
+    </div>
+    <div class="card">
+      <h3>📊 Cihaz Dağılımı</h3>
+      ${Object.entries(byDevice).map(([k,v])=>`<div class="item"><b>${esc(k)}</b><span>${v} servis</span></div>`).join("") || '<div class="empty">Henüz servis kaydı yok.</div>'}
+    </div>`;
+};
+
+window.refreshCloudData = async function(){
+  if(!user) return;
+  await loadAll();
 };
 
 window.faults=function(){
