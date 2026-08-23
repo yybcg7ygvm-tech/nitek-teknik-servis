@@ -50,7 +50,7 @@ function renderHome(){
   if(r) r.innerHTML=serviceData.slice(0,5).map(serviceCard).join("")||'<div class="empty">Henüz servis kaydı yok.</div>';
 }
 function serviceCard(s){
-  return `<div class="item"><strong>${esc(s.customer_name)}</strong><div>📅 ${esc(s.service_date||"")} ${esc(s.service_time||"")} · ${esc(s.device)} · ${esc(s.brand)} ${esc(s.model)}</div><div class="muted">${esc(s.type)} · ${esc(s.complaint||"")}</div><div class="muted">💰 ${money(s.total)} · ${esc(s.payment||"")}</div><div class="row"><button onclick="openServiceDetail('${s.id}')">Detay</button><button onclick="makePDF('${s.id}')">PDF</button></div></div>`;
+  return `<div class="item"><strong>${esc(s.customer_name)}</strong><div>📅 ${esc(s.service_date||"")} ${esc(s.service_time||"")} · ${esc(s.device)} · ${esc(s.brand)} ${esc(s.model)}</div><div class="muted">${esc(s.type)} · ${esc(s.complaint||"")}</div><div class="muted">💰 ${money(s.total)} · ${esc(s.payment||"")}</div><div class="row"><button onclick="openServiceDetail('${s.id}')">Detay</button><button class="light" onclick="deleteService('${s.id}')">🗑️ Sil</button><button onclick="makePDF('${s.id}')">PDF</button></div></div>`;
 }
 
 window.customers=function(){
@@ -223,6 +223,23 @@ window.faultSearchRender=function(){
   $("faultList").innerHTML=out.length
     ? out.map(r=>`<div class="item"><strong>🔥 ${esc(r.brand)} → ${esc(r.model)} → ${esc(r.x[0])}</strong><div>${esc(r.x[1])}</div><small>${esc(r.x[2])}</small></div>`).join("")
     : '<div class="empty">Arıza kodu bulunamadı.</div>';
+};
+
+window.deleteService=async function(id){
+  if(!id)return;
+  const s=serviceData.find(x=>x.id===id);
+  if(!s)return;
+  if(!confirm(`"${s.customer_name||"Bu servis"}" servis kaydını silmek istediğine emin misin?`))return;
+
+  const {error}=await db.from("services").delete().eq("id",id);
+  if(error){
+    alert("Servis kaydı silinemedi: "+error.message);
+    return;
+  }
+
+  await loadAll();
+  show("services");
+  alert("Servis kaydı silindi.");
 };
 
 window.reports=function(){
