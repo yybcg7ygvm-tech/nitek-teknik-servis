@@ -1,0 +1,7 @@
+1) Supabase SQL Editor'e supabase.sql dosyasının tamamını yapıştırıp Run'a bas.
+2) GitHub Pages'teki eski dosyaların yerine bu paketin dosyalarını yükle.
+3) app-config.js içindeki URL ve publishable key hazırdır.
+4) Supabase Authentication > Providers > Email açık olmalı.
+5) Authentication > URL Configuration bölümünde GitHub Pages adresini Site URL / Redirect URL olarak ekle.
+6) Kayıt sonrası Supabase'in gönderdiği doğrulama e-postasını açıp hesabı doğrula, sonra giriş yap.
+7) Secret key'i hiçbir yere koyma.
