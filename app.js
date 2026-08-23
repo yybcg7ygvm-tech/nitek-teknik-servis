@@ -151,95 +151,23 @@ window.openServiceDetail=function(id){
 };
 
 window.faults=function(){
-  const data=window.NITEK_FAULT_GUIDE?.models||{};
-  const b=$("faultBrand"),m=$("faultModel"),c=$("faultCode");
-  if(!b||!m||!c)return;
-
-  b.innerHTML='<option value="">Marka seç</option>'+
-    Object.keys(data).map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");
-  m.innerHTML='<option value="">Önce marka seç</option>';
-  c.innerHTML='<option value="">Önce model seç</option>';
-  m.disabled=true;c.disabled=true;
-  $("faultList").innerHTML="";
-  $("faultDetail").innerHTML="";
-};
-
-window.faultModelList=function(){
-  const data=window.NITEK_FAULT_GUIDE?.models||{};
-  const b=$("faultBrand"),m=$("faultModel"),c=$("faultCode");
-  if(!b||!m||!c)return;
-  const models=data[b.value]||{};
-  m.innerHTML='<option value="">Model seç</option>'+
-    Object.keys(models).map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");
-  c.innerHTML='<option value="">Önce model seç</option>';
-  m.disabled=!b.value;c.disabled=true;
-  $("faultList").innerHTML="";
-  $("faultDetail").innerHTML="";
-};
-
-window.faultCodeList=function(){
-  const data=window.NITEK_FAULT_GUIDE?.models||{};
-  const b=$("faultBrand"),m=$("faultModel"),c=$("faultCode");
-  if(!b||!m||!c)return;
-  const item=data[b.value]?.[m.value];
-  const codes=item?.codes||[];
-  c.innerHTML='<option value="">Arıza kodu seç</option>'+
-    codes.map((x,i)=>`<option value="${i}">${esc(x[0])} — ${esc(x[1])}</option>`).join("");
-  c.disabled=!m.value;
-  $("faultDetail").innerHTML="";
-  $("faultList").innerHTML=codes.length
-    ? `<div class="muted">${codes.length} doğrulanmış arıza kaydı bulundu.</div>`
-    : '<div class="empty">Bu model için doğrulanmış kod bulunamadı.</div>';
-};
-
-window.faultShowCode=function(){
-  const data=window.NITEK_FAULT_GUIDE?.models||{};
-  const b=$("faultBrand"),m=$("faultModel"),c=$("faultCode"),d=$("faultDetail");
-  if(!b||!m||!c||!d)return;
-  const codes=data[b.value]?.[m.value]?.codes||[];
-  const x=codes[Number(c.value)];
-  if(!x){d.innerHTML="";return;}
-  d.innerHTML=`<div class="card">
-    <h3>🔴 ${esc(x[0])}</h3>
-    <p><b>Arıza:</b> ${esc(x[1])}</p>
-    <p><b>Muhtemel neden:</b> ${esc(x[2])}</p>
-    <p><b>Kontrol / rehber:</b> ${esc(x[3])}</p>
-    <p class="muted">Bu bölüm yalnızca arıza rehberidir; servis kaydına aktarılmaz.</p>
-  </div>`;
-};
-
-window.faultSearchRender=function(){
-  const q=($("faultSearch")?.value||"").toLocaleLowerCase("tr-TR").trim();
-  const data=window.NITEK_FAULT_GUIDE?.models||{};
-  const out=[];
-  Object.keys(data).forEach(brand=>{
-    Object.keys(data[brand]||{}).forEach(model=>{
-      (data[brand][model]?.codes||[]).forEach(x=>{
-        const text=(brand+" "+model+" "+x.join(" ")).toLocaleLowerCase("tr-TR");
-        if(!q||text.includes(q))out.push({brand,model,x});
-      });
-    });
-  });
-  $("faultList").innerHTML=out.length
-    ? out.map(r=>`<div class="item"><strong>🔥 ${esc(r.brand)} → ${esc(r.model)} → ${esc(r.x[0])}</strong><div>${esc(r.x[1])}</div><small>${esc(r.x[2])}</small></div>`).join("")
-    : '<div class="empty">Arıza kodu bulunamadı.</div>';
+  const q=($("faultSearch")?.value||"").toLocaleLowerCase("tr-TR");
+  const list=(window.NITEK_DATA?.faults||[]).filter(x=>x.join(" ").toLocaleLowerCase("tr-TR").includes(q));
+  $("faultList").innerHTML=list.map(x=>`<div class="item"><strong>🔥 ${esc(x[0])}</strong><div>${esc(x[1])}</div><small>${esc(x[2])}</small></div>`).join("")||'<div class="empty">Arıza kodu bulunamadı.</div>';
 };
 
 window.deleteService=async function(id){
-  if(!id)return;
   const s=serviceData.find(x=>x.id===id);
   if(!s)return;
-  if(!confirm(`"${s.customer_name||"Bu servis"}" servis kaydını silmek istediğine emin misin?`))return;
+  if(!confirm("Bu servis kaydını silmek istediğine emin misin?"))return;
 
   const {error}=await db.from("services").delete().eq("id",id);
   if(error){
     alert("Servis kaydı silinemedi: "+error.message);
     return;
   }
-
   await loadAll();
   show("services");
-  alert("Servis kaydı silindi.");
 };
 
 window.reports=function(){
