@@ -151,13 +151,35 @@ window.openServiceDetail=function(id){
 };
 
 window.faults=function(){
-  const brands=Object.keys(window.NITEK_FAULT_GUIDE?.models||{});
-  const b=$("faultBrand");
-  if(!b)return;
-  const current=b.value;
-  b.innerHTML='<option value="">Marka seç</option>'+brands.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");
-  if(current && brands.includes(current)) b.value=current;
-  faultModelList();
+  const box=$("faultList"); if(!box)return;
+  const guide=window.NITEK_FAULT_GUIDE?.models||{};
+  const brands=Object.keys(guide);
+  box.innerHTML=`<div class="card">
+    <label>Marka</label>
+    <select id="guideBrand"><option value="">Marka seç</option>${brands.map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join("")}</select>
+    <label>Model</label>
+    <select id="guideModel" disabled><option>Önce marka seç</option></select>
+    <label>Arıza Kodu</label>
+    <select id="guideCode" disabled><option>Önce model seç</option></select>
+    <div id="guideResult" class="card muted">Marka ve model seçerek arıza kodlarını görüntüle.</div>
+  </div>`;
+  const b=$("guideBrand"),m=$("guideModel"),c=$("guideCode"),r=$("guideResult");
+  b.onchange=()=>{
+    const models=guide[b.value]||{};
+    m.innerHTML=`<option value="">Model seç</option>${Object.keys(models).map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("")}`;
+    m.disabled=!b.value;c.disabled=true;c.innerHTML='<option value="">Önce model seç</option>';
+    r.innerHTML='Model seçerek arıza kodlarını görüntüle.';
+  };
+  m.onchange=()=>{
+    const codes=guide[b.value]?.[m.value]?.codes||[];
+    c.innerHTML=`<option value="">Arıza kodu seç</option>${codes.map((x,i)=>`<option value="${i}">${esc(x[0])} — ${esc(x[1])}</option>`).join("")}`;
+    c.disabled=!m.value;r.innerHTML=codes.length?`${codes.length} doğrulanmış arıza kaydı bulundu.`:'Bu model için doğrulanmış kod bulunamadı.';
+  };
+  c.onchange=()=>{
+    const x=(guide[b.value]?.[m.value]?.codes||[])[Number(c.value)];
+    if(!x){r.innerHTML='Arıza kodu seç.';return;}
+    r.innerHTML=`<h3>🔴 ${esc(x[0])}</h3><p><b>Arıza:</b> ${esc(x[1])}</p><p><b>Muhtemel neden:</b> ${esc(x[2])}</p><p><b>Kontrol / rehber:</b> ${esc(x[3])}</p><p class="muted">Bu arıza rehberi servis kaydına aktarılmaz.</p>`;
+  };
 };
 
 window.faultModelList=function(){
