@@ -1,0 +1,1 @@
+window.NITEK_FAULT_GUIDE={version:"brand-files-test-1.0",description:"Demirdöküm ve Bosch ayrı dosyalardan yüklenir.",models:Object.assign({},(window.NITEK_FAULTS_DEMIRDOKUM&&window.NITEK_FAULTS_DEMIRDOKUM.models)||{},(window.NITEK_FAULTS_BOSCH&&window.NITEK_FAULTS_BOSCH.models)||{})};
