@@ -153,59 +153,47 @@ window.openServiceDetail=function(id){
 window.faults=function(){
   const q=($("faultSearch")?.value||"").toLocaleLowerCase("tr-TR");
   const guide=window.NITEK_FAULT_GUIDE?.models||{};
-  const brand=$("faultBrand")?.value||"";
-  const model=$("faultModel")?.value||"";
+  const brands=Object.keys(guide);
+  const b=$("faultBrand");
+  if(b){
+    const current=b.value;
+    b.innerHTML='<option value="">Marka seç</option>'+brands.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");
+    if(brands.includes(current)) b.value=current;
+  }
+  const brand=$("faultBrand")?.value, model=$("faultModel")?.value;
   const codes=guide[brand]?.[model]?.codes||[];
   const list=codes.filter(x=>x.join(" ").toLocaleLowerCase("tr-TR").includes(q));
   $("faultList").innerHTML=list.map(x=>`<div class="item" onclick='faultPick(${JSON.stringify(x)})'><strong>🔥 ${esc(x[0])}</strong><div>${esc(x[1])}</div><small>${esc(x[2])}</small></div>`).join("")||'<div class="empty">Arıza kodu bulunamadı.</div>';
 };
-
-window.initFaultBrands=function(){
-  const guide=window.NITEK_FAULT_GUIDE?.models||{};
-  const b=$("faultBrand"), m=$("faultModel"), c=$("faultCode");
-  if(!b)return;
-  const brands=Object.keys(guide);
-  b.innerHTML='<option value="">Marka seç</option>'+brands.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");
-  if(m)m.innerHTML='<option value="">Önce marka seç</option>';
-  if(c)c.innerHTML='<option value="">Önce model seç</option>';
-};
-
 window.faultModelList=function(){
-  const guide=window.NITEK_FAULT_GUIDE?.models||{};
-  const brand=$("faultBrand")?.value||"";
-  const m=$("faultModel"), c=$("faultCode");
+  const guide=window.NITEK_FAULT_GUIDE?.models||{}, brand=$("faultBrand")?.value, m=$("faultModel");
+  if(!m)return;
   const models=Object.keys(guide[brand]||{});
-  if(m)m.innerHTML='<option value="">Model seç</option>'+models.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");
-  if(c)c.innerHTML='<option value="">Önce model seç</option>';
-  $("faultList").innerHTML="";
-  $("faultDetail").innerHTML="";
+  m.innerHTML='<option value="">Model seç</option>'+models.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");
+  $("faultCode").innerHTML='<option value="">Önce model seç</option>';
+  $("faultList").innerHTML=""; $("faultDetail").innerHTML="";
 };
-
 window.faultCodeList=function(){
-  const guide=window.NITEK_FAULT_GUIDE?.models||{};
-  const brand=$("faultBrand")?.value||"";
-  const model=$("faultModel")?.value||"";
+  const guide=window.NITEK_FAULT_GUIDE?.models||{}, brand=$("faultBrand")?.value, model=$("faultModel")?.value;
   const codes=guide[brand]?.[model]?.codes||[];
   $("faultCode").innerHTML='<option value="">Arıza kodu seç</option>'+codes.map(x=>`<option value="${esc(x[0])}">${esc(x[0])} — ${esc(x[1])}</option>`).join("");
-  $("faultDetail").innerHTML="";
-  faults();
+  $("faultDetail").innerHTML=""; faults();
 };
-
 window.faultShowCode=function(){
-  const guide=window.NITEK_FAULT_GUIDE?.models||{};
-  const brand=$("faultBrand")?.value||"";
-  const model=$("faultModel")?.value||"";
-  const code=$("faultCode")?.value||"";
+  const guide=window.NITEK_FAULT_GUIDE?.models||{}, brand=$("faultBrand")?.value, model=$("faultModel")?.value, code=$("faultCode")?.value;
   const x=(guide[brand]?.[model]?.codes||[]).find(v=>v[0]===code);
   $("faultDetail").innerHTML=x?`<div class="card"><h3>🔥 ${esc(x[0])}</h3><p><b>Arıza:</b> ${esc(x[1])}</p><p><b>Muhtemel neden:</b> ${esc(x[2])}</p><p><b>Kontrol:</b> ${esc(x[3])}</p></div>`:"";
 };
-
-window.faultPick=function(x){
-  const c=$("faultCode");
-  if(c){c.value=x[0];faultShowCode();}
-};
-
+window.faultPick=function(x){const c=$("faultCode");if(c){c.value=x[0];faultShowCode();}};
 window.faultSearchRender=function(){faults();};
+function initFaultBrands(){
+  const guide=window.NITEK_FAULT_GUIDE?.models||{}, b=$("faultBrand");
+  if(!b)return;
+  const brands=Object.keys(guide);
+  b.innerHTML='<option value="">Marka seç</option>'+brands.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");
+  $("faultModel").innerHTML='<option value="">Önce marka seç</option>';
+  $("faultCode").innerHTML='<option value="">Önce model seç</option>';
+}
 
 window.deleteService=async function(id){
   const s=serviceData.find(x=>x.id===id);
