@@ -92,16 +92,18 @@ window.startServiceFor=function(id){
 };
 
 window.brandList=function(){
-  const dev=$("device")?.value,b=$("brand");if(!b)return;
+  const dev=$("device")?.value,brandInput=$("brand"),list=$("brandOptions");if(!brandInput||!list)return;
   const brands=(window.NITEK_DATA?.brands||{})[dev]||{};
   const names=Object.keys(brands);
-  b.innerHTML=names.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("")||'<option value="">Marka yok</option>';
+  // Marka artık serbest metin alanıdır. Mevcut markalar sadece öneri olarak gösterilir.
+  list.innerHTML=names.map(x=>`<option value="${esc(x)}"></option>`).join("");
   modelList();
 };
 window.modelList=function(){
-  const dev=$("device")?.value,brand=$("brand")?.value,m=$("model");if(!m)return;
+  const dev=$("device")?.value,brand=($("brand")?.value||"").trim(),list=$("modelOptions");if(!list)return;
   const models=((window.NITEK_DATA?.brands||{})[dev]||{})[brand]||[];
-  m.innerHTML=models.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("")||'<option value="">Model yok</option>';
+  // Model de serbest metin alanıdır. Seçilebilir modeller sadece öneri olarak gösterilir.
+  list.innerHTML=models.map(x=>`<option value="${esc(x)}"></option>`).join("");
 };
 window.serviceType=function(){
   const isM=$("type")?.value==="Bakım";
