@@ -50,7 +50,7 @@ function renderHome(){
   if(r) r.innerHTML=serviceData.slice(0,5).map(serviceCard).join("")||'<div class="empty">Henüz servis kaydı yok.</div>';
 }
 function serviceCard(s){
-  return `<div class="item"><strong>${esc(s.customer_name)}</strong><div>📅 ${esc(s.service_date||"")} ${esc(s.service_time||"")} · ${esc(s.device)} · ${esc(s.brand)} ${esc(s.model)}</div><div class="muted">${esc(s.type)} · ${esc(s.complaint||"")}</div><div class="muted">💰 ${money(s.total)} · ${esc(s.payment||"")}</div><div class="row"><button onclick="openServiceDetail('${s.id}')">Detay</button><button class="light" onclick="deleteService(\'${s.id}\')">🗑️ Sil</button><button onclick="makePDF('${s.id}')">PDF</button></div></div>`;
+  return `<div class="item"><strong>${esc(s.customer_name)}</strong><div>📅 ${esc(s.service_date||"")} ${esc(s.service_time||"")} · ${esc(s.device)} · ${esc(s.brand)} ${esc(s.model)}</div><div class="muted">${esc(s.type)} · ${esc(s.complaint||"")}</div><div class="muted">💰 ${money(s.total)} · ${esc(s.payment||"")}</div><div class="row"><button onclick="openServiceDetail('${s.id}')">Detay</button><button class="light" onclick="deleteService(\'${s.id}\')">🗑️ Sil</button><button onclick="makePDF('${s.id}')">📄 PDF</button><button class="blue" onclick="sharePDF('${s.id}')">📤 Müşteriye Gönder</button></div></div>`;
 }
 
 window.customers=function(){
@@ -92,18 +92,16 @@ window.startServiceFor=function(id){
 };
 
 window.brandList=function(){
-  const dev=$("device")?.value,brandInput=$("brand"),list=$("brandOptions");if(!brandInput||!list)return;
+  const dev=$("device")?.value,b=$("brand");if(!b)return;
   const brands=(window.NITEK_DATA?.brands||{})[dev]||{};
   const names=Object.keys(brands);
-  // Marka artık serbest metin alanıdır. Mevcut markalar sadece öneri olarak gösterilir.
-  list.innerHTML=names.map(x=>`<option value="${esc(x)}"></option>`).join("");
+  b.innerHTML=names.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("")||'<option value="">Marka yok</option>';
   modelList();
 };
 window.modelList=function(){
-  const dev=$("device")?.value,brand=($("brand")?.value||"").trim(),list=$("modelOptions");if(!list)return;
+  const dev=$("device")?.value,brand=$("brand")?.value,m=$("model");if(!m)return;
   const models=((window.NITEK_DATA?.brands||{})[dev]||{})[brand]||[];
-  // Model de serbest metin alanıdır. Seçilebilir modeller sadece öneri olarak gösterilir.
-  list.innerHTML=models.map(x=>`<option value="${esc(x)}"></option>`).join("");
+  m.innerHTML=models.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("")||'<option value="">Model yok</option>';
 };
 window.serviceType=function(){
   const isM=$("type")?.value==="Bakım";
@@ -148,7 +146,7 @@ window.services=function(){
 window.openServiceDetail=function(id){
   const s=serviceData.find(x=>x.id===id);if(!s)return;
   const checks=Array.isArray(s.done_checks)?s.done_checks:[];
-  $("detail").innerHTML=`<div class="card"><button class="light" onclick="show('services')">← Geri</button><h2>📋 Servis Detayı</h2><p><b>Müşteri:</b> ${esc(s.customer_name)}</p><p><b>Telefon:</b> ${esc(s.phone)}</p><p><b>Adres:</b> ${esc(s.address)}</p><p><b>Tür:</b> ${esc(s.type)} · <b>Cihaz:</b> ${esc(s.device)} · ${esc(s.brand)} ${esc(s.model)}</p><p><b>Şikâyet:</b> ${esc(s.complaint)}</p><p><b>Yapılan işler:</b><br>${esc(s.work)}</p><p><b>Değişen parça:</b><br>${esc(s.parts_text)}</p>${checks.length?`<h3>🛠️ Yapılan Bakım Kontrolleri</h3><ul>${checks.map(x=>`<li>☑️ ${esc(x)}</li>`).join("")}</ul>`:""}<p><b>Toplam:</b> ${money(s.total)} · <b>Ödeme:</b> ${esc(s.payment)}</p><p><b>Tarih:</b> ${esc(s.service_date)} ${esc(s.service_time)}</p><button class="primary" onclick="makePDF('${s.id}')">📄 PDF Oluştur</button></div>`;
+  $("detail").innerHTML=`<div class="card"><button class="light" onclick="show('services')">← Geri</button><h2>📋 Servis Detayı</h2><p><b>Müşteri:</b> ${esc(s.customer_name)}</p><p><b>Telefon:</b> ${esc(s.phone)}</p><p><b>Adres:</b> ${esc(s.address)}</p><p><b>Tür:</b> ${esc(s.type)} · <b>Cihaz:</b> ${esc(s.device)} · ${esc(s.brand)} ${esc(s.model)}</p><p><b>Şikâyet:</b> ${esc(s.complaint)}</p><p><b>Yapılan işler:</b><br>${esc(s.work)}</p><p><b>Değişen parça:</b><br>${esc(s.parts_text)}</p>${checks.length?`<h3>🛠️ Yapılan Bakım Kontrolleri</h3><ul>${checks.map(x=>`<li>☑️ ${esc(x)}</li>`).join("")}</ul>`:""}<p><b>Toplam:</b> ${money(s.total)} · <b>Ödeme:</b> ${esc(s.payment)}</p><p><b>Tarih:</b> ${esc(s.service_date)} ${esc(s.service_time)}</p><div class="actions"><button class="primary" onclick="makePDF('${s.id}')">📄 PDF Oluştur</button><button class="blue" onclick="sharePDF('${s.id}')">📤 Müşteriye Gönder</button></div></div>`;
   show("detail");
 };
 
@@ -217,11 +215,40 @@ window.reports=function(){
   $("report").innerHTML=`<div class="grid"><div class="card"><b>${customerData.length}</b><div>Müşteri</div></div><div class="card"><b>${serviceData.length}</b><div>Servis</div></div><div class="card"><b>${money(total)}</b><div>Toplam Ciro</div></div></div><div class="card"><h3>Servis Türleri</h3>${Object.entries(counts).map(([k,v])=>`<div>${esc(k)}: <b>${v}</b></div>`).join("")||"Henüz kayıt yok."}</div>`;
 };
 
-window.makePDF=function(id){
-  const s=serviceData.find(x=>x.id===id);if(!s)return;
+window.buildPDF=function(id){
+  const s=serviceData.find(x=>x.id===id);if(!s)throw new Error("Servis kaydı bulunamadı.");
   const checks=Array.isArray(s.done_checks)?s.done_checks:[];
-  const html=`<!doctype html><html lang="tr"><head><meta charset="utf-8"><title>NİTEK Servis Formu</title><style>@page{size:A4;margin:12mm}body{font-family:Arial;color:#14233d}.head{display:flex;align-items:center;border-bottom:3px solid #c71920;padding-bottom:15px}.logo{width:85px;height:85px;object-fit:contain;margin-right:18px}.sec{border:1px solid #d5dbe2;margin:16px 0;border-radius:8px;overflow:hidden}.sec h2{margin:0;background:#10203a;color:#fff;padding:9px;font-size:13px}.body{padding:12px}.row{margin:7px 0}.total{font-size:18px;font-weight:bold}.actions{position:fixed;right:15px;top:15px}@media print{.actions{display:none}}</style></head><body><div class="actions"><button onclick="print()">PDF / Yazdır</button></div><div class="head"><img class="logo" src="logo.jpg"><div><h1>NİTEK TEKNİK SERVİS</h1><div>Kombi • Klima • Bakım • Onarım • Montaj</div></div></div><div class="sec"><h2>MÜŞTERİ</h2><div class="body"><div class="row"><b>Ad Soyad:</b> ${esc(s.customer_name)}</div><div class="row"><b>Telefon:</b> ${esc(s.phone)}</div><div class="row"><b>Adres:</b> ${esc(s.address)}</div></div></div><div class="sec"><h2>SERVİS</h2><div class="body"><div class="row"><b>Tür:</b> ${esc(s.type)}</div><div class="row"><b>Cihaz:</b> ${esc(s.device)} · ${esc(s.brand)} ${esc(s.model)}</div><div class="row"><b>Tarih:</b> ${esc(s.service_date)} ${esc(s.service_time)}</div><div class="row"><b>Şikâyet:</b> ${esc(s.complaint)}</div><div class="row"><b>Yapılan İşler:</b><br>${esc(s.work)}</div><div class="row"><b>Değişen Parça:</b><br>${esc(s.parts_text)}</div>${checks.length?`<div class="row"><b>Bakım Kontrolleri:</b><ul>${checks.map(x=>`<li>☑️ ${esc(x)}</li>`).join("")}</ul></div>`:""}</div></div><div class="sec"><h2>ÜCRET</h2><div class="body"><div class="row">İşçilik: ${money(s.labor)}</div><div class="row">Parça: ${money(s.parts)}</div><div class="row total">Toplam: ${money(s.total)}</div><div class="row">Ödeme: ${esc(s.payment)}</div></div></div></body></html>`;
-  const w=window.open("","_blank");if(!w){alert("Açılır pencereye izin ver.");return;}w.document.write(html);w.document.close();
+  const JsPDF=window.jspdf?.jsPDF;if(!JsPDF)throw new Error("PDF motoru yüklenemedi. İnternet bağlantısını kontrol edin.");
+  const doc=new JsPDF({unit:"mm",format:"a4"});
+  const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight(); let y=16;
+  const margin=14, max=W-margin*2;
+  const text=v=>String(v??"");
+  const line=(label,value)=>{doc.setFontSize(10);doc.setFont(undefined,"bold");doc.text(label,margin,y);doc.setFont(undefined,"normal");const x=margin+doc.getTextWidth(label)+2;const lines=doc.splitTextToSize(text(value),Math.max(20,max-(x-margin)));doc.text(lines,x,y);y+=Math.max(6,lines.length*5);};
+  const section=t=>{if(y>H-30){doc.addPage();y=16;}doc.setFillColor(16,32,58);doc.setTextColor(255,255,255);doc.rect(margin,y-5,max,8,"F");doc.setFontSize(11);doc.setFont(undefined,"bold");doc.text(t,margin+3,y);doc.setTextColor(20,35,61);y+=9;};
+  doc.setFont(undefined,"bold");doc.setFontSize(18);doc.setTextColor(7,21,47);doc.text("NİTEK TEKNİK SERVİS",margin,y);y+=7;doc.setFont(undefined,"normal");doc.setFontSize(9);doc.text("Kombi • Klima • Bakım • Onarım • Montaj",margin,y);y+=5;doc.setDrawColor(199,25,32);doc.setLineWidth(.8);doc.line(margin,y,W-margin,y);y+=10;
+  section("MÜŞTERİ"); line("Ad Soyad:",s.customer_name); line("Telefon:",s.phone); line("Adres:",s.address); y+=3;
+  section("SERVİS"); line("Tür:",s.type); line("Cihaz:",s.device); line("Marka:",s.brand); line("Model:",s.model); line("Tarih:",`${s.service_date||""} ${s.service_time||""}`); line("Şikâyet:",s.complaint); line("Yapılan İşler:",s.work); line("Değişen Parça:",s.parts_text);
+  if(checks.length){y+=2;doc.setFont(undefined,"bold");doc.text("Bakım Kontrolleri:",margin,y);y+=6;doc.setFont(undefined,"normal");checks.forEach(c=>{const ls=doc.splitTextToSize("✓ "+text(c),max-4);doc.text(ls,margin+2,y);y+=Math.max(5,ls.length*5);});}
+  y+=4;section("ÜCRET");line("İşçilik:",money(s.labor));line("Parça:",money(s.parts));doc.setFont(undefined,"bold");doc.setFontSize(13);doc.text("TOPLAM:",margin,y);doc.text(money(s.total),W-margin-doc.getTextWidth(money(s.total)),y);y+=8;line("Ödeme:",s.payment);if(s.note)line("Not:",s.note);
+  if(y>H-25){doc.addPage();y=20;}y+=8;doc.setFontSize(9);doc.setFont(undefined,"normal");doc.text("Müşteri İmzası: ____________________",margin,y);doc.text("Teknisyen: ____________________",W/2+5,y);y+=10;doc.setFontSize(8);doc.text("Bu servis formu NİTEK Teknik Servis uygulaması tarafından oluşturulmuştur.",margin,y);
+  return doc;
+};
+window.makePDF=function(id){
+  try{const doc=buildPDF(id);const s=serviceData.find(x=>x.id===id);const filename=`NITEK-Servis-${(s.customer_name||"Musteri").replace(/[^a-z0-9ğüşöçıİĞÜŞÖÇ_-]+/gi,"-")}-${s.service_date||""}.pdf`;doc.save(filename);}catch(e){alert("PDF oluşturulamadı: "+e.message);}
+};
+window.sharePDF=async function(id){
+  try{
+    const s=serviceData.find(x=>x.id===id);if(!s)throw new Error("Servis kaydı bulunamadı.");
+    const doc=buildPDF(id);const blob=doc.output("blob");
+    const safe=(s.customer_name||"Musteri").replace(/[^a-z0-9ğüşöçıİĞÜŞÖÇ_-]+/gi,"-");
+    const file=new File([blob],`NITEK-Servis-${safe}.pdf`,{type:"application/pdf"});
+    if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
+      await navigator.share({title:"NİTEK Teknik Servis Formu",text:`${s.customer_name} servis formu`,files:[file]});
+    }else{
+      const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=file.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+      alert("Bu cihaz doğrudan dosya paylaşımını desteklemiyor. PDF indirildi; Dosyalar/İndirilenler bölümünden WhatsApp ile gönderebilirsin.");
+    }
+  }catch(e){if(e?.name!=="AbortError")alert("PDF paylaşımı yapılamadı: "+e.message);}
 };
 
 document.addEventListener("DOMContentLoaded",()=>{
